@@ -57,7 +57,7 @@ async function checkIn(){
     // 关闭相机，打开海报
     stream.getTracks().forEach(track=>track.stop());
     document.getElementById("cameraWrap").style.display = "none";
-    document.getElementById("posterWrap").style.display = "block";
+    document.getElementById("posterWrap").style.display = "flex";
     if(posterURL && posterURL.startsWith("blob:")) URL.revokeObjectURL(posterURL);
     posterURL = imgURL(imgRef);
     document.getElementById("posterImg").src = posterURL;

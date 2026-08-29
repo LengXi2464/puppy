@@ -59,8 +59,18 @@ video{width:100%;transform: scaleX(-1); /*前置镜像*/}
     background:#1c1614;
     padding:20px;
     display:none;
+    flex-direction:column;
+    overflow:auto;
 }
-.poster-img{width:100%;border:12px solid #222;}
-.btn-row{display:flex;gap:12px;margin-top:30px;}
+.poster-box h2{flex-shrink:0;}
+.poster-img{
+    width:100%;
+    flex:1;
+    min-height:0;
+    object-fit:contain;
+    border:12px solid #222;
+}
+.btn-row{display:flex;gap:12px;margin-top:30px;flex-shrink:0;}
 .btn-row button{flex:1;padding:18px;border:none;font-size:18px;border-radius:4px;}
+.poster-box .btn-close{flex-shrink:0;}
 .btn-row button.active{outline:3px solid #e8e0d8;outline-offset:-6px;}
