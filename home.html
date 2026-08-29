@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>今日拍照</title>
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+    <div>
+        <p class="tag" id="statusText">今天还没打卡</p>
+        <h2>今日拍照</h2>
+        <p class="slogan" id="slogan">我是Kuro爸爸的小狗Puppy</p>
+        <p class="sub-desc">吐舌头拍几张，选最好看的一张再打卡·将用前置摄像头</p>
+        <button class="btn-orange" onclick="openCamera()">打开相机</button>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="tab-bar">
+        <div class="tab-item tab-active">今日拍照</div>
+        <div class="tab-item" onclick="location.href='calendar.html'">打卡日历</div>
+        <div class="tab-item" onclick="location.href='index.html?edit'">我的</div>
+    </div>
+
+    <!-- 相机界面 -->
+    <div class="camera-box" id="cameraWrap">
+        <video id="video" autoplay playsinline></video>
+        <canvas class="photo-canvas" id="canvas"></canvas>
+        <div class="camera-bottom">
+            <h3 id="cameraTip">准备拍照</h3>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button style="width:25%;padding:16px;">前置</button>
+                <button style="flex:1;padding:16px;background:#f2c288;color:#000;font-weight:bold;" onclick="takePicture()">拍照</button>
+                <button style="flex:1;padding:16px;background:#80492f;" onclick="checkIn()">打卡</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 海报弹窗 -->
+    <div class="poster-box" id="posterWrap">
+        <h2 id="posterTitle">海报标题</h2>
+        <img class="poster-img" id="posterImg"/>
+        <div class="btn-row">
+            <button id="btnPuppy" style="background:#d96b3e" onclick="setPosterMode('puppy')">小狗版海报</button>
+            <button id="btnDad" style="background:#e2bc86" onclick="setPosterMode('dad')">爸爸版海报</button>
+        </div>
+        <button style="width:100%;margin-top:16px;padding:14px;background:#333;" onclick="closePoster()">关闭</button>
+    </div>
+
+<script src="db.js"></script>
+<script src="home.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+*{margin:0;padding:0;box-sizing:border-box;font-family: system-ui;}
+body{
+    background: #1c1614;
+    color:#e8e0d8;
+    min-height:100vh;
+    padding:40px 24px 80px;
+}
+.tag{border:1px solid #e8e0d860;padding:8px 12px;width:fit-content;}
+h2{font-size:44px;margin:12px 0;}
+.slogan{font-size:22px;margin-bottom:8px;}
+.sub-desc{color:#e8e0d870;margin-bottom:60px;}
+.btn-orange{
+    width:100%;
+    background:#d96b3e;
+    color:#000;
+    font-weight:bold;
+    font-size:22px;
+    border:none;
+    padding:20px;
+    border-radius:4px;
+}
+/* 底部导航栏 */
+.tab-bar{
+    position:fixed;
+    left:0;
+    bottom:0;
+    width:100%;
+    display:flex;
+    border-top:1px solid #e8e0d830;
+    background:#1c1614;
+}
+.tab-item{
+    flex:1;
+    text-align:center;
+    padding:16px 0;
+}
+.tab-active{font-weight:bold;}
+
+/* 相机弹窗样式 */
+.camera-box{
+    position:fixed;
+    inset:0;
+    background:#000;
+    display:none;
+}
+video{width:100%;transform: scaleX(-1); /*前置镜像*/}
+.camera-bottom{
+    position:absolute;
+    bottom:30px;
+    width:100%;
+    padding:0 16px;
+}
+.photo-canvas{display:none;}
+
+/* 海报弹窗 */
+.poster-box{
+    position:fixed;
+    inset:0;
+    background:#1c1614;
+    padding:20px;
+    display:none;
+}
+.poster-img{width:100%;border:12px solid #222;}
+.btn-row{display:flex;gap:12px;margin-top:30px;}
+.btn-row button{flex:1;padding:18px;border:none;font-size:18px;border-radius:4px;}
+.btn-row button.active{outline:3px solid #e8e0d8;outline-offset:-6px;}

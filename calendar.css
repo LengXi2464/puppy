@@ -1,0 +1,42 @@
+*{margin:0;padding:0;box-sizing:border-box;font-family: system-ui;}
+body{
+    background: #1c1614;
+    color:#e8e0d8;
+    min-height:100vh;
+    padding:40px 16px 80px;
+}
+h2{font-size:44px;margin-bottom:8px;}
+.slogan{color:#e8e0d870;margin-bottom:30px;}
+.calendar-wrap{
+    display:grid;
+    grid-template-columns: repeat(7,1fr);
+    gap:6px;
+}
+.day-cell{
+    aspect-ratio:1;
+    border:1px solid #e8e0d820;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+}
+.day-cell.has-img{
+    background-size:cover;
+    background-position:center;
+}
+/* 底部导航栏 */
+.tab-bar{
+    position:fixed;
+    left:0;
+    bottom:0;
+    width:100%;
+    display:flex;
+    border-top:1px solid #e8e0d830;
+    background:#1c1614;
+}
+.tab-item{
+    flex:1;
+    text-align:center;
+    padding:16px 0;
+}
+.tab-active{font-weight:bold;}
