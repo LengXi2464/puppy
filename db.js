@@ -50,6 +50,17 @@ async function dbPut(record){
     });
 }
 
+// 清空全部打卡记录（日历页「清空」按钮用）
+async function dbClearAll(){
+    const db = await openDB();
+    return new Promise((resolve,reject)=>{
+        const tx = db.transaction(STORE,"readwrite");
+        tx.objectStore(STORE).clear();
+        tx.oncomplete = ()=>{ db.close(); resolve(); };
+        tx.onerror = ()=>reject(tx.error);
+    });
+}
+
 // 旧 base64 数据转 Blob
 function base64ToBlob(dataURL){
     const [head, data] = dataURL.split(",");

@@ -183,3 +183,69 @@ h2::after{content:"🌸";font-size:.6em;margin-left:8px;}
     border-bottom:7px solid transparent;
     margin-left:4px;
 }
+
+/* ===== 清空打卡（需密码） ===== */
+.clear-btn{
+    margin-top:clamp(18px, 4vh, 28px);
+    color:#d4556e;
+}
+.clear-box{
+    width:min(360px, 100%);
+    background:var(--glass-bg-strong);
+    backdrop-filter:var(--glass-blur-strong);
+    -webkit-backdrop-filter:var(--glass-blur-strong);
+    border:1px solid var(--glass-brd);
+    border-radius:26px;
+    padding:clamp(20px, 5vw, 28px);
+    box-shadow:0 20px 60px rgba(93,63,106,.28), var(--glass-inset);
+}
+.clear-box h3{
+    font-size:clamp(18px, 5vw, 20px);
+    font-weight:800;
+}
+.clear-tip{
+    color:var(--ink-soft);
+    font-size:13.5px;
+    line-height:1.6;
+    margin:10px 0 16px;
+}
+.clear-box input{
+    width:100%;
+    background:rgba(255,255,255,.6);
+    border:1px solid var(--glass-brd);
+    border-radius:14px;
+    padding:12px 14px;
+    font-size:15px;
+    color:var(--ink);
+    outline:none;
+    box-shadow:var(--glass-inset);
+    transition:border-color .2s ease;
+}
+.clear-box input:focus{border-color:var(--primary);}
+.clear-actions{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+}
+.clear-actions button{
+    flex:1;
+    border:none;
+    padding:13px 0;
+    border-radius:16px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .15s ease;
+}
+.clear-actions button:active{transform:scale(.96);}
+.clear-actions .btn-plain{
+    background:rgba(255,255,255,.55);
+    border:1px solid var(--glass-brd);
+    color:var(--ink-soft);
+    box-shadow:var(--glass-inset);
+}
+.clear-actions .btn-danger{
+    background:linear-gradient(135deg,#f45f8e,#ffb28c);
+    color:#fff;
+    box-shadow:0 8px 20px rgba(244,95,142,.38), inset 0 1px 1px rgba(255,255,255,.6);
+}

@@ -101,7 +101,7 @@ function setMode(mode){
     }else{
         btn.innerText = "开始录制";
         btn.classList.add("recording");
-        tip.innerText = "录制一段短视频打卡";
+        tip.innerText = "录制一段短视频打卡（会录进声音）";
     }
     // 清空上一次的拍摄成果
     capturedBlob = null;
@@ -192,7 +192,11 @@ function startRecording(){
     },500);
     const btn = document.getElementById("btnCapture");
     btn.innerText = "停止录制";
-    document.getElementById("cameraTip").innerText = "录制中… 再次点击停止";
+    // 麦克风不可用时明确提示，避免录完才发现没声音
+    const hasAudio = stream.getAudioTracks && stream.getAudioTracks().length > 0;
+    document.getElementById("cameraTip").innerText = hasAudio
+        ? "录制中…（含声音）再次点击停止"
+        : "录制中…（未检测到麦克风，视频将没有声音）";
 }
 
 // —— 停止录制（discard=丢弃；silent=不弹「录像完成」提示，供打卡流程静默调用） ——
@@ -212,7 +216,7 @@ function stopRecording(discard, silent){
     }
     btn.innerText = "开始录制";
     btn.classList.add("recording");
-    document.getElementById("cameraTip").innerText = "录制一段短视频打卡";
+    document.getElementById("cameraTip").innerText = "录制一段短视频打卡（会录进声音）";
 }
 
 // 上传到图床，成功返回链接，失败返回null（回落本地存储）

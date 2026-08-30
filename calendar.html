@@ -14,6 +14,22 @@
         <!-- 日历格子由JS生成 -->
     </div>
 
+    <!-- 清空全部打卡（需密码） -->
+    <button class="btn-ghost clear-btn" onclick="openClearModal()">🗑 清空全部打卡记录</button>
+
+    <!-- 清空打卡 · 密码确认弹窗 -->
+    <div class="preview-mask" id="clearMask" style="display:none;">
+        <div class="clear-box">
+            <h3>清空全部打卡记录</h3>
+            <p class="clear-tip">将删除日历里的所有照片和视频打卡，操作无法恢复。请输入密码确认。</p>
+            <input type="password" id="clearPwd" placeholder="输入密码" autocomplete="off" onkeydown="if(event.key==='Enter')doClearAll()"/>
+            <div class="clear-actions">
+                <button class="btn-plain" onclick="closeClearModal()">取消</button>
+                <button class="btn-danger" onclick="doClearAll()">确认清空</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 底部导航 -->
     <div class="tab-bar">
         <div class="tab-item" data-icon="📷" onclick="location.href='home.html'">今日拍照</div>

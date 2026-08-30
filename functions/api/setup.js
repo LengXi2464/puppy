@@ -12,6 +12,14 @@ export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const hook = `${url.origin}/api/webhook`;
+  // token 没设置/没生效时，Telegram 同样返回 401，这里提前给出明确提示
+  if (!env.TG_Bot_Token) {
+    return corsJson({
+      ok: false,
+      webhook: hook,
+      tg: { ok: false, error_code: 401, description: "环境变量 TG_Bot_Token 未设置或未生效（在 Pages 设置里添加后需重新部署）" },
+    });
+  }
   const tg = await fetch(
     `https://api.telegram.org/bot${env.TG_Bot_Token}/setWebhook?url=${encodeURIComponent(hook)}`
   );

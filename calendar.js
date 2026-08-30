@@ -158,3 +158,37 @@ renderCalendar().catch((e) => {
     const box = document.getElementById("calendarBox");
     if (box) box.innerText = "日历加载失败：" + String(e?.message || e) + "（可刷新重试）";
 });
+
+// ===== 清空全部打卡记录（需密码确认） =====
+const CLEAR_PWD = "Kuro";
+
+function openClearModal(){
+    const mask = document.getElementById("clearMask");
+    mask.style.display = "flex";
+    // 点深色遮罩空白处关闭（点弹窗本身不关）
+    mask.onclick = e => { if(e.target === mask) closeClearModal(); };
+    const input = document.getElementById("clearPwd");
+    input.value = "";
+    setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 60);
+}
+
+function closeClearModal(){
+    document.getElementById("clearMask").style.display = "none";
+}
+
+async function doClearAll(){
+    const pwd = document.getElementById("clearPwd").value;
+    if(pwd !== CLEAR_PWD){
+        alert("密码不正确，无法清空打卡记录");
+        return;
+    }
+    if(!confirm("确定要清空日历里的全部打卡记录吗？删除后无法恢复！")) return;
+    try{
+        await dbClearAll();
+    }catch(e){
+        alert("清空失败：" + String(e?.message || e));
+        return;
+    }
+    closeClearModal();
+    await renderCalendar();
+}
