@@ -22,21 +22,38 @@ h2::after{content:"💬";font-size:.62em;margin-left:6px;}
 .chat-list{
     flex:1;
     min-height:0;
+    width:100%;              /* 确保占满父容器宽度，不受全局 margin 居中影响内部 */
+    max-width:none !important;   /* 聊天列使用自己的宽度规则，覆盖 theme.css 的 620px 限制 */
+    margin:0 !important;
     overflow-y:auto;
     display:flex;
     flex-direction:column;
+    align-items:stretch;     /* 关键：确保每一行消息占满列表宽度 */
     gap:14px;
     padding:4px 2px 12px;
+    box-sizing:border-box;
 }
-/* 桌面端聊天列比其他页更宽一点，手机端自动占满 */
-body > div.chat-list{ max-width:min(760px, 100%); }
+/* 桌面端聊天列比其他页更宽一点，手机端自动占满 —— 用外层 wrapper 控制，而不是列表本身 */
+body > div.chat-list{
+    max-width:min(760px, calc(100% - 0px)) !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+}
 
 .msg-row{
     display:flex;
     align-items:flex-start;
+    justify-content:flex-start;   /* 对方消息：从左边开始贴边 */
+    width:100%;                   /* 关键：强制占满整行宽度 */
     gap:10px;
+    box-sizing:border-box;
 }
-.msg-row.me{ flex-direction:row-reverse; }   /* 自己：头像在右 */
+.msg-row.me{
+    justify-content:flex-end;     /* 自己的消息：从右边开始贴边 */
+}
+/* 自己的消息：气泡在左、头像在右，保持 row 方向但调整顺序（更稳妥） */
+.msg-row.me .avatar{ order:2; }
+.msg-row.me .msg{ order:1; }
 
 .avatar{
     flex:0 0 40px;
