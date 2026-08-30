@@ -10,7 +10,7 @@ let lastPollTs = 0;
 
 function setStatus(text, ok) {
     statusDom.textContent = text;
-    statusDom.style.color = ok === true ? "#8fd18f" : ok === false ? "#e47a7a" : "";
+    statusDom.style.color = ok === true ? "#4caf8e" : ok === false ? "#e5637f" : "";
 }
 
 // 防呆：没填 endpoint 就报错

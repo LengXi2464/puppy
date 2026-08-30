@@ -24,7 +24,8 @@ function saveInfo(){
 }
 
 // 已保存过昵称时，回填现有配置，方便修改
-const savedConfig = JSON.parse(localStorage.getItem("puppyConfig"));
+let savedConfig = null;
+try { savedConfig = JSON.parse(localStorage.getItem("puppyConfig") || "null"); } catch(e) {}
 if(savedConfig){
     dadInput.value = savedConfig.dad;
     pupInput.value = savedConfig.puppy;
@@ -124,7 +125,7 @@ let exportRunning = false;
 
 function closeExport(){
     if(exportRunning){
-        if(!confirm("打包正在进行，确定要关闭吗？zip 可能还未上传到TG/图床")) return;
+        if(!confirm("打包正在进行，确定要关闭吗？zip 可能还未上传到 Kuro/图床")) return;
     }
     document.getElementById("exportModal").style.display = "none";
 }
@@ -133,7 +134,7 @@ async function exportAllToTG(){
     if(exportRunning) return;
     const records = await dbGetAll();
     if(!records.length){ alert("还没有任何打卡记录～"); return; }
-    if(!confirm(`确定要把本机 ${records.length} 条打卡内容（照片/视频）全部打包发到 TG 频道吗？\n永远只会生成 1 个 zip，大小仅受你浏览器内存限制。`)) return;
+    if(!confirm(`确定要把本机 ${records.length} 条打卡内容（照片/视频）全部打包发到 Kuro 吗？\n永远只会生成 1 个 zip，大小仅受你浏览器内存限制。`)) return;
 
     document.getElementById("exportModal").style.display = "flex";
     exportRunning = true;
@@ -207,10 +208,11 @@ async function exportAllToTG(){
             compression: "STORE",
             compressionOptions: null,
         }, (meta) => {
+            // 注意：这里不能引用 zipBlob（此时还没赋值完成，会触发 TDZ ReferenceError）
             const overall = Math.round(50 + 30 * (meta.percent/100));
             setExportStats(
                 `生成 zip 中… <b>${Math.round(meta.percent)}%</b> · ${meta.currentFile || ""}`,
-                overall, `zip ${(zipBlob && zipBlob.size)?(zipBlob.size/1024/1024).toFixed(1)+"MB":""}`
+                overall, ""
             );
         });
 
@@ -230,7 +232,7 @@ async function exportAllToTG(){
         });
 
         // 阶段 4：TG 发 1 条文字消息（95%~100%）
-        setExportStats(`zip 已存到图床，正在在 TG 频道发 1 条通知…`, 95, "");
+        setExportStats(`zip 已存到图床，正在在 Kuro 发 1 条通知…`, 95, "");
         const tgLines = [];
         tgLines.push(`🐶 全部打卡备份（${dateTag}）`);
         tgLines.push(`共 ${records.length} 条记录，${flatItems.length} 个文件，打包 ${(zipBlob.size/1024/1024).toFixed(1)}MB`);
@@ -239,7 +241,7 @@ async function exportAllToTG(){
         await sendTextToTG(tgLines.join("\n"));
 
         const summaryHtml = [];
-        summaryHtml.push(`✅ 全部完成！<br>· 共打包 <b>${flatItems.length}</b> 个文件（${records.length} 条记录中的可用部分）<br>· zip 大小 <b>${(zipBlob.size/1024/1024).toFixed(1)}MB</b><br>· TG 频道已收到 1 条消息（含下载链接）`);
+        summaryHtml.push(`✅ 全部完成！<br>· 共打包 <b>${flatItems.length}</b> 个文件（${records.length} 条记录中的可用部分）<br>· zip 大小 <b>${(zipBlob.size/1024/1024).toFixed(1)}MB</b><br>· Kuro 已收到 1 条消息（含下载链接）`);
         if(failArr.length){
             summaryHtml.push(`<br>❌ 打包失败 <b>${failArr.length}</b> 条：<br>` +
                 failArr.slice(0,20).map(f => `· ${f.date||''} ${f.rec||''}：${f.err}`).join("<br>") +

@@ -1,8 +1,11 @@
-// 读取昵称配置
-const config = JSON.parse(localStorage.getItem("puppyConfig"));
-const dadName = config.dad;
-const pupName = config.puppy;
-document.getElementById("slogan").innerText = `我是${dadName}爸爸的小狗${pupName}`;
+// 读取昵称配置（无配置时回落到 Kuro/Puppy，避免 null 抛错导致整页功能无法用）
+let cfg;
+try { cfg = JSON.parse(localStorage.getItem("puppyConfig") || "null"); } catch(e) {}
+if (!cfg) cfg = { dad: "Kuro", puppy: "Puppy" };
+const dadName = cfg.dad;
+const pupName = cfg.puppy;
+const slogan = document.getElementById("slogan");
+if (slogan) slogan.innerText = `我是${dadName}爸爸的小狗${pupName}`;
 
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
@@ -18,24 +21,72 @@ let posterURL = null;
 let posterMode = "puppy"; // 海报风格：puppy小狗版 / dad爸爸版
 let dayCount = 1;
 
+// 当前镜头：user 前置 / environment 后置
+let curFacing = "user";
+
 // 当前模式 photo/video
 let curMode = "photo";
 
-// —— 打开前置摄像头 ——
-async function openCamera(){
-    document.getElementById("cameraWrap").style.display = "block";
+// —— 打开指定摄像头（前置 or 后置）——
+async function openCamera(facing){
+    if (!facing) facing = curFacing;
+    // 先停掉旧的流，避免摄像头被占用
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+    }
+    // 授权成功后才展示相机框，避免权限被拒时留下黑屏
     stream = await navigator.mediaDevices.getUserMedia({
-        video:{facingMode:"user"},
-        audio:true, // 录像需要音频
+        video: { facingMode: facing },
+        audio: true,
     });
+    document.getElementById("cameraWrap").style.display = "block";
     video.srcObject = stream;
+    // 镜像：前置才开，后置关掉（防止上下左右文字反了）
+    video.style.transform = facing === "user" ? "scaleX(-1)" : "none";
+    // 更新按钮文字，让用户一眼看到现在是哪个镜头
+    curFacing = facing;
+    const btn = document.getElementById("btnCameraSwitch");
+    if (btn) btn.innerText = facing === "user" ? "前置" : "后置";
+    // 更新副标题，让用户知道当前用的是哪个镜头
+    const sub = document.getElementById("subDesc");
+    if (sub) sub.innerText = facing === "user"
+        ? "吐舌头拍几张，选最好看的一张再打卡·将用前置摄像头"
+        : "吐舌头拍几张，选最好看的一张再打卡·将用后置摄像头";
+}
+
+// —— 首页「打开相机」入口：统一捕获错误，避免静默无反应 ——
+async function startCamera(){
+    try{
+        await openCamera();
+    }catch(e){
+        alert("无法打开摄像头：" + String(e?.message || e) + "\n请检查是否已授权相机权限，且页面通过 HTTPS 访问。");
+    }
+}
+
+// —— 前/后镜头切换：点一次换一次 ——
+async function switchCamera(){
+    // 录像中切换会丢失当前录制，先问用户
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+        if (!confirm("切换摄像头会停止正在录制的视频并丢弃，确定？")) return;
+        stopRecording(true, true);
+    }
+    const prev = curFacing;
+    const next = curFacing === "user" ? "environment" : "user";
+    try {
+        await openCamera(next);
+    } catch (e) {
+        alert("切换失败：" + String(e?.message || e) + "\n（可能是设备没有对应摄像头，或权限被拒）");
+        // 切换失败时旧流已被停掉，尝试恢复原镜头，避免黑屏卡死
+        try{ await openCamera(prev); }catch(e2){}
+    }
 }
 
 // —— 拍照模式 vs 录像模式 切换 ——
 function setMode(mode){
     if(mediaRecorder && mediaRecorder.state === "recording"){
         if(!confirm("切换模式会停止正在录制的视频，确定？")) return;
-        stopRecording(true); // 丢弃当前录制
+        stopRecording(true, true); // 丢弃当前录制
     }
     curMode = mode;
     document.getElementById("modePhoto").classList.toggle("active", mode==="photo");
@@ -44,13 +95,12 @@ function setMode(mode){
     const tip = document.getElementById("cameraTip");
     if(mode === "photo"){
         btn.innerText = "拍照";
-        btn.style.background = "#f2c288";
+        btn.classList.remove("recording");
         tip.innerText = "准备拍照";
         document.getElementById("recIndicator").style.display = "none";
     }else{
         btn.innerText = "开始录制";
-        btn.style.background = "#ff3b30";
-        btn.style.color = "#fff";
+        btn.classList.add("recording");
         tip.innerText = "录制一段短视频打卡";
     }
     // 清空上一次的拍摄成果
@@ -70,14 +120,23 @@ function onCaptureClick(){
     }
 }
 
-// —— 拍照：保留设备原始分辨率，JPEG 高质量，不做任何压缩/缩放
+// —— 拍照：保留设备原始分辨率，JPEG 高质量；前置镜像后置正常 ——
 function takePicture(){
+    if(!video.videoWidth || !video.videoHeight){
+        alert("相机还没准备好，稍等一下再拍～");
+        return;
+    }
     const w = video.videoWidth;
     const h = video.videoHeight;
     canvas.width = w;
     canvas.height = h;
-    ctx.translate(w, 0);
-    ctx.scale(-1, 1); // 和画面镜像保持一致
+    // 先重置 transform
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    if (curFacing === "user") {
+        // 前置：和预览镜像一致（用户看到的自己）
+        ctx.translate(w, 0);
+        ctx.scale(-1, 1);
+    }
     ctx.drawImage(video, 0, 0, w, h);
     canvas.toBlob(blob => {
         capturedBlob = blob;
@@ -88,9 +147,11 @@ function takePicture(){
 
 // —— 开始录制视频：优先 MP4(H.264/AAC)，浏览器不支持时回落 WebM，不人为限制码率 ——
 let selectedVideoMime = "";
+let recDiscard = false; // onstop 是异步的：丢弃时用标志位阻止 onstop 回写 capturedBlob
 function startRecording(){
     if(!stream){alert("摄像头未打开");return;}
     recChunks = [];
+    recDiscard = false;
     // 优先 MP4（Safari 17.4+ / 未来的 Chrome 支持），不支持则回落 WebM 家族
     const candidates = [
         "video/mp4;codecs=avc1.64001f,mp4a.40.2",   // H.264 High + AAC LC
@@ -113,6 +174,7 @@ function startRecording(){
     }
     mediaRecorder.ondataavailable = e => { if(e.data.size>0) recChunks.push(e.data); };
     mediaRecorder.onstop = () => {
+        if(recDiscard){ recChunks = []; return; } // 已丢弃：不生成成品
         const type = (recChunks[0] && recChunks[0].type) || selectedVideoMime || "";
         capturedBlob = new Blob(recChunks, {type: type || "video/webm"});
         capturedType = "video";
@@ -130,14 +192,13 @@ function startRecording(){
     },500);
     const btn = document.getElementById("btnCapture");
     btn.innerText = "停止录制";
-    btn.style.background = "#ff3b30";
-    btn.style.color = "#fff";
     document.getElementById("cameraTip").innerText = "录制中… 再次点击停止";
 }
 
-// —— 停止录制 ——
-function stopRecording(discard){
+// —— 停止录制（discard=丢弃；silent=不弹「录像完成」提示，供打卡流程静默调用） ——
+function stopRecording(discard, silent){
     if(!mediaRecorder || mediaRecorder.state==="inactive") return;
+    recDiscard = !!discard; // 必须在 stop() 之前设置，onstop 会异步触发
     mediaRecorder.stop();
     clearInterval(recTimer);
     recTimer = null;
@@ -146,11 +207,11 @@ function stopRecording(discard){
     if(discard){
         capturedBlob = null;
         capturedType = "video";
-    }else{
+    }else if(!silent){
         alert("录像完成，可以打卡！");
     }
     btn.innerText = "开始录制";
-    btn.style.background = "#ff3b30";
+    btn.classList.add("recording");
     document.getElementById("cameraTip").innerText = "录制一段短视频打卡";
 }
 
@@ -168,7 +229,7 @@ async function checkIn(){
     }
     // 如果处于录像模式但还没停止，先自动停止
     if(mediaRecorder && mediaRecorder.state === "recording"){
-        stopRecording(false);
+        stopRecording(false, true);
         await new Promise(r=>setTimeout(r,150)); // 等 mediaRecorder.onstop 生成 Blob
         if(!capturedBlob){alert("录制失败，请重试");return;}
     }
@@ -184,7 +245,7 @@ async function checkIn(){
     if(mediaRecorder && mediaRecorder.state==="recording") mediaRecorder.stop();
     clearInterval(recTimer);
     document.getElementById("recIndicator").style.display = "none";
-    stream.getTracks().forEach(track=>track.stop());
+    if(stream) stream.getTracks().forEach(track=>track.stop());
 
     document.getElementById("cameraWrap").style.display = "none";
     document.getElementById("posterWrap").style.display = "flex";
@@ -215,7 +276,7 @@ function buildTitle(){
     document.getElementById("posterTitle").innerText = posterMode === "puppy"
         ? `我是${dadName}爸爸的小狗${pupName} · 第${dayCount}天`
         : `我是${pupName}的爸爸${dadName} · 打卡第${dayCount}天`;
-    const borderColor = posterMode === "puppy" ? "#d96b3e" : "#e2bc86";
+    const borderColor = posterMode === "puppy" ? "#ff8fab" : "#c9b8f2";
     document.getElementById("posterImg").style.borderColor = borderColor;
     document.getElementById("posterVideo").style.borderColor = borderColor;
     document.getElementById("btnPuppy").classList.toggle("active", posterMode === "puppy");
@@ -306,9 +367,9 @@ async function onBatchPick(files) {
     const zipSize = batchState.uploaded.reduce((s, u) => s + u.size, 0);
     const count = batchState.uploaded.length;
     setBatchStats(
-        `✅ 已新增 <b>${count}</b> 条打卡记录。<br>将生成 <b>1 个 zip</b>（约 <b>${(zipSize/1024/1024).toFixed(1)}MB</b>），上传到你的图床后，在 TG 频道只发 1 条下载链接消息。`,
+        `✅ 已新增 <b>${count}</b> 条打卡记录。<br>将生成 <b>1 个 zip</b>（约 <b>${(zipSize/1024/1024).toFixed(1)}MB</b>），上传到你的图床后，在 Kuro 只发 1 条下载链接消息。`,
         100,
-        "可写一段说明文字，确认后点「完成·打包发到TG」。"
+        "可写一段说明文字，确认后点「完成·打包发到Kuro」。"
     );
     document.getElementById("batchZipBtn").disabled = false;
 
@@ -442,7 +503,7 @@ async function finalizeBatch() {
         });
 
         // 步骤 3：TG 只发 1 条消息（文字 + 链接，无 50MB 限制）（90%~100%）
-        setBatchStats(`zip 已上传到图床，正在通知 TG 频道…`, 92, ``);
+        setBatchStats(`zip 已上传到图床，正在通知 Kuro…`, 92, ``);
         const lines = [];
         if (caption) lines.push("📦 " + caption);
         lines.push(`共 ${count} 个文件 · 打包 ${(zipBlob.size/1024/1024).toFixed(1)}MB`);
@@ -451,7 +512,7 @@ async function finalizeBatch() {
 
         document.getElementById("batchBar").style.width = "100%";
         setBatchStats(
-            `✅ 全部完成！<br>· 新增打卡记录：<b>${count}</b> 条<br>· 打包 zip：<b>${(zipBlob.size/1024/1024).toFixed(1)}MB</b><br>· TG 频道已收到 1 条消息（含下载链接）`,
+            `✅ 全部完成！<br>· 新增打卡记录：<b>${count}</b> 条<br>· 打包 zip：<b>${(zipBlob.size/1024/1024).toFixed(1)}MB</b><br>· Kuro 已收到 1 条消息（含下载链接）`,
             100, `点击下载链接就能拿到这个 zip。`
         );
         document.getElementById("batchTitle").innerText = "打包完成（1 个 zip）";
@@ -465,7 +526,7 @@ async function finalizeBatch() {
         btn.innerText = "关闭";
         btn.onclick = () => {
             btn.onclick = () => {};
-            btn.innerText = "完成·打包发到TG";
+            btn.innerText = "完成·打包发到Kuro";
             btn.disabled = false;
             cancelBatch();
         };

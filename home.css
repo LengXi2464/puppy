@@ -1,138 +1,204 @@
-*{margin:0;padding:0;box-sizing:border-box;font-family: system-ui;}
-body{
-    background: #1c1614;
-    color:#e8e0d8;
-    min-height:100vh;
-    padding:40px 24px 80px;
-}
-.tag{border:1px solid #e8e0d860;padding:8px 12px;width:fit-content;}
-h2{font-size:44px;margin:12px 0;}
-.slogan{font-size:22px;margin-bottom:8px;}
-.sub-desc{color:#e8e0d870;margin-bottom:60px;}
-.btn-orange{
-    width:100%;
-    background:#d96b3e;
-    color:#000;
-    font-weight:bold;
-    font-size:22px;
-    border:none;
-    padding:20px;
-    border-radius:4px;
-}
-.btn-secondary{
-    width:100%;
-    margin-top:14px;
-    background:#2d2522;
-    color:#f2c288;
-    font-weight:bold;
-    font-size:18px;
-    border:1px solid #e8e0d830;
-    padding:16px;
-    border-radius:4px;
-}
-/* 底部导航栏 */
-.tab-bar{
-    position:fixed;
-    left:0;
-    bottom:0;
-    width:100%;
-    display:flex;
-    border-top:1px solid #e8e0d830;
-    background:#1c1614;
-}
-.tab-item{
-    flex:1;
-    text-align:center;
-    padding:12px 0;
-    font-size:13px;
-}
-.tab-active{font-weight:bold;}
+/* ===== 今日拍照页（依赖 theme.css · 液态玻璃） ===== */
 
-/* 相机弹窗样式 */
+body{
+    padding:clamp(36px, 6vh, 48px) clamp(18px, 5vw, 24px) 130px;
+}
+
+h2{
+    font-size:clamp(30px, 8vw, 40px);
+    font-weight:800;
+    margin:14px 0 6px;
+    letter-spacing:.5px;
+}
+h2::after{content:"🐾";font-size:.6em;margin-left:8px;}
+
+.slogan{
+    font-size:clamp(15px, 4.2vw, 17px);
+    color:var(--ink-soft);
+    margin-bottom:8px;
+}
+.sub-desc{
+    color:var(--ink-faint);
+    font-size:14px;
+    line-height:1.7;
+    margin-bottom:clamp(24px, 5vh, 36px);
+}
+
+.btn-orange{margin-top:10px;}
+
+/* ===== 相机界面（深色沉浸 + 暗玻璃） ===== */
 .camera-box{
     position:fixed;
     inset:0;
-    background:#000;
+    height:100vh;
+    height:100dvh;
+    background:#16100f;
     display:none;
+    z-index:100;
 }
-video{width:100%;transform: scaleX(-1); /*前置镜像*/}
+.camera-box video{
+    width:100%;height:100%;
+    object-fit:cover;
+    transform:scaleX(-1); /*前置镜像，JS 会按镜头切换*/
+    background:#000;
+}
+.photo-canvas{display:none;}
 
-/* 拍照 / 录像 模式切换 */
+/* 拍照 / 录像 模式切换：暗玻璃分段控件 */
 .mode-tabs{
     position:absolute;
-    top:16px;
+    top:calc(16px + env(safe-area-inset-top, 0px));
     left:50%;
     transform:translateX(-50%);
     display:flex;
-    gap:6px;
-    background:#0008;
+    gap:4px;
+    background:rgba(30,20,26,.42);
     padding:4px;
     border-radius:999px;
-    backdrop-filter:blur(10px);
+    backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 8px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.22);
+    z-index:3;
 }
 .mode-tab{
     background:transparent;
     border:none;
     color:#fff;
-    padding:8px 20px;
+    padding:8px 22px;
     border-radius:999px;
     font-size:15px;
-    opacity:.7;
+    opacity:.6;
+    cursor:pointer;
+    transition:all .25s ease;
 }
 .mode-tab.active{
-    background:#fff;
-    color:#111;
+    background:linear-gradient(135deg,var(--primary),var(--peach));
+    color:#fff;
     opacity:1;
-    font-weight:bold;
+    font-weight:700;
+    box-shadow:0 4px 14px rgba(244,95,142,.45), inset 0 1px 1px rgba(255,255,255,.5);
 }
 
 /* 录制中指示灯 */
 .rec-indicator{
     position:absolute;
-    top:68px;
+    top:calc(72px + env(safe-area-inset-top, 0px));
     left:50%;
     transform:translateX(-50%);
     display:flex;
     align-items:center;
     gap:8px;
-    background:#000a;
-    padding:6px 14px;
+    background:rgba(30,20,26,.5);
+    padding:7px 16px;
     border-radius:999px;
     color:#fff;
     font-size:14px;
     font-variant-numeric:tabular-nums;
+    backdrop-filter:blur(16px) saturate(150%);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);
+    border:1px solid rgba(255,255,255,.16);
+    z-index:3;
 }
 .rec-dot{
-    width:12px;height:12px;
-    background:#ff3b30;
+    width:11px;height:11px;
+    background:#ff4d6d;
     border-radius:50%;
-    animation: recPulse 1.2s ease-in-out infinite;
+    box-shadow:0 0 10px rgba(255,77,109,.8);
+    animation:recPulse 1.2s ease-in-out infinite;
 }
 @keyframes recPulse{
     0%,100%{opacity:1;transform:scale(1);}
-    50%{opacity:.35;transform:scale(.75);}
+    50%{opacity:.4;transform:scale(.7);}
 }
 
 .camera-bottom{
     position:absolute;
-    bottom:30px;
+    bottom:calc(26px + env(safe-area-inset-bottom, 0px));
     width:100%;
-    padding:0 16px;
+    padding:0 clamp(18px, 5vw, 40px);
+    z-index:3;
 }
-.photo-canvas{display:none;}
-.camera-bottom h3{color:#fff;margin-bottom:4px;font-size:16px;}
+.camera-bottom h3{
+    color:rgba(255,255,255,.92);
+    margin-bottom:14px;
+    font-size:15px;
+    font-weight:500;
+    text-align:center;
+    text-shadow:0 1px 8px rgba(0,0,0,.5);
+}
+.cam-actions{display:flex;gap:12px;}
+.cam-actions button{
+    padding:clamp(14px, 4.4vw, 17px) 8px;
+    border:none;
+    border-radius:22px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .15s ease;
+}
+.cam-actions button:active{transform:scale(.95);}
 
-/* 海报弹窗 */
+/* 切换镜头：暗玻璃 */
+#btnCameraSwitch{
+    width:25%;
+    background:rgba(255,255,255,.14);
+    color:#fff;
+    border:1px solid rgba(255,255,255,.28);
+    backdrop-filter:blur(18px) saturate(150%);
+    -webkit-backdrop-filter:blur(18px) saturate(150%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 6px 18px rgba(0,0,0,.22);
+}
+
+/* 拍照/录制主按钮：粉桃玻璃渐变，录像时变红 */
+#btnCapture{
+    flex:1;
+    position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--primary),var(--peach));
+    color:#fff;
+    box-shadow:0 10px 26px rgba(244,95,142,.45),
+               inset 0 1px 1px rgba(255,255,255,.55);
+}
+#btnCapture::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 52%);
+    pointer-events:none;
+}
+#btnCapture.recording{
+    background:#ff4d6d;
+    box-shadow:0 10px 26px rgba(255,77,109,.45),
+               inset 0 1px 1px rgba(255,255,255,.45);
+}
+
+/* 打卡按钮：亮玻璃 */
+.cam-actions button:nth-child(3){
+    flex:1;
+    background:rgba(255,255,255,.85);
+    color:var(--primary-deep);
+    box-shadow:0 8px 22px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+/* ===== 海报弹窗：全屏亮玻璃 ===== */
 .poster-box{
     position:fixed;
     inset:0;
-    background:#1c1614;
-    padding:20px;
+    background:linear-gradient(165deg,rgba(255,246,250,.86),rgba(255,243,236,.86) 52%,rgba(242,239,254,.86));
+    backdrop-filter:blur(30px) saturate(170%);
+    -webkit-backdrop-filter:blur(30px) saturate(170%);
+    padding:calc(clamp(16px, 3vh, 22px) + env(safe-area-inset-top, 0px)) clamp(16px, 4vw, 24px) calc(clamp(14px, 3vh, 20px) + env(safe-area-inset-bottom, 0px));
     display:none;
     flex-direction:column;
     overflow:auto;
+    z-index:110;
 }
-.poster-box h2{flex-shrink:0;}
+.poster-box h2{
+    flex-shrink:0;
+    font-size:clamp(21px, 5.6vw, 26px);
+    text-align:center;
+    margin:6px 0 14px;
+}
+.poster-box h2::after{content:none;}
 .poster-media{
     width:100%;
     flex:1;
@@ -145,54 +211,141 @@ video{width:100%;transform: scaleX(-1); /*前置镜像*/}
     width:100%;
     max-height:100%;
     object-fit:contain;
-    border:12px solid #222;
-    border-radius:2px;
+    border:10px solid rgba(255,255,255,.92);
+    border-radius:26px;
+    box-shadow:0 20px 50px rgba(93,63,106,.25), inset 0 1px 0 rgba(255,255,255,.9);
+    background:#fff;
 }
-.poster-video{background:#000;}
-.btn-row{display:flex;gap:12px;margin-top:30px;flex-shrink:0;}
-.btn-row button{flex:1;padding:18px;border:none;font-size:18px;border-radius:4px;}
-.poster-box .btn-close{flex-shrink:0;}
-.btn-row button.active{outline:3px solid #e8e0d8;outline-offset:-6px;}
+.btn-row{display:flex;gap:12px;margin-top:clamp(16px, 3vh, 24px);flex-shrink:0;}
+.poster-btn{
+    flex:1;
+    padding:clamp(13px, 3.6vw, 15px);
+    background:var(--glass-bg);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    border:1px solid var(--glass-brd);
+    color:var(--ink);
+    font-size:16px;
+    font-weight:600;
+    border-radius:20px;
+    cursor:pointer;
+    box-shadow:var(--glass-shadow), var(--glass-inset);
+    transition:all .25s ease;
+}
+.poster-btn.active{
+    background:linear-gradient(135deg,var(--primary),var(--peach));
+    color:#fff;
+    border-color:transparent;
+    box-shadow:0 10px 24px rgba(244,95,142,.4), inset 0 1px 1px rgba(255,255,255,.5);
+}
+.poster-box .btn-close{
+    flex-shrink:0;
+    width:100%;
+    margin-top:14px;
+    padding:clamp(13px, 3.6vw, 15px);
+    background:var(--glass-bg);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    color:var(--ink-soft);
+    border:1px solid var(--glass-brd);
+    border-radius:20px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:var(--glass-shadow), var(--glass-inset);
+}
 
-/* 批量补传弹窗 */
+/* ===== 批量补传弹窗：液态玻璃卡片 ===== */
 .batch-modal{
     position:fixed;inset:0;
-    background:rgba(0,0,0,.85);
+    background:rgba(70,48,74,.38);
+    backdrop-filter:blur(10px) saturate(140%);
+    -webkit-backdrop-filter:blur(10px) saturate(140%);
     z-index:200;
-    display:flex;align-items:center;justify-content:center;
+    display:none;
+    align-items:center;justify-content:center;
     padding:18px;
 }
 .batch-inner{
     width:100%;max-width:480px;
-    background:#1c1614;
-    border:1px solid #e8e0d825;
-    border-radius:14px;
-    padding:22px;
-    color:#e8e0d8;
+    background:var(--glass-bg-strong);
+    backdrop-filter:var(--glass-blur-strong);
+    -webkit-backdrop-filter:var(--glass-blur-strong);
+    border:1px solid var(--glass-brd);
+    border-radius:30px;
+    padding:clamp(20px, 5vw, 26px);
+    color:var(--ink);
+    box-shadow:0 24px 70px rgba(93,63,106,.25), var(--glass-inset);
 }
-.batch-inner h3{font-size:22px;margin-bottom:12px;}
+.batch-inner h3{font-size:20px;margin-bottom:14px;font-weight:800;}
 .batch-stats{
-    font-size:15px;margin-bottom:12px;line-height:1.7;
+    font-size:15px;margin-bottom:12px;line-height:1.8;
 }
-.batch-stats b{color:#f2c288;}
+.batch-stats b{color:var(--primary-deep);}
 .batch-progress{
     width:100%;height:10px;
-    background:#e8e0d815;border-radius:999px;overflow:hidden;margin-bottom:8px;
+    background:rgba(255,255,255,.55);
+    border-radius:999px;overflow:hidden;margin-bottom:8px;
+    box-shadow:inset 0 1px 2px rgba(93,63,106,.12);
 }
 .batch-progress>div{
-    height:100%;width:0%;background:linear-gradient(90deg,#d96b3e,#f2c288);
+    height:100%;width:0%;
+    background:linear-gradient(90deg,var(--primary),var(--peach));
+    border-radius:999px;
+    box-shadow:0 0 10px rgba(244,95,142,.5);
     transition:width .25s ease;
 }
-.batch-sub{font-size:13px;color:#e8e0d870;margin-bottom:14px;min-height:1.5em;line-height:1.6;}
+.batch-sub{
+    font-size:13px;color:var(--ink-faint);
+    margin-bottom:14px;min-height:1.5em;line-height:1.6;
+}
 .batch-modal textarea{
     width:100%;
-    padding:10px 12px;
-    border-radius:8px;
-    border:1px solid #e8e0d830;
-    background:#2d2522;color:#e8e0d8;font-size:14px;
+    padding:12px 16px;
+    border-radius:18px;
+    border:1px solid var(--glass-brd);
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    color:var(--ink);
+    font-size:14px;
     resize:vertical;outline:none;
     margin-bottom:16px;
+    transition:border-color .2s ease, background .2s ease;
 }
-.batch-modal textarea:focus{border-color:#d96b3e;}
+.batch-modal textarea:focus{border-color:var(--primary);background:rgba(255,255,255,.75);}
 .batch-actions{display:flex;gap:10px;}
+.btn-plain{
+    flex:1;
+    padding:14px;
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    color:var(--ink-soft);
+    border:1px solid var(--glass-brd);
+    border-radius:18px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:var(--glass-inset);
+}
+.btn-primary{
+    flex:1;
+    position:relative;overflow:hidden;
+    padding:14px;
+    background:linear-gradient(135deg,var(--primary),var(--peach));
+    color:#fff;
+    border:none;
+    border-radius:18px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(244,95,142,.4), inset 0 1px 1px rgba(255,255,255,.5);
+}
+.btn-primary::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,0) 52%);
+    pointer-events:none;
+}
 .batch-actions button[disabled]{opacity:.5;cursor:not-allowed;}

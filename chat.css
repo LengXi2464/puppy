@@ -1,15 +1,22 @@
-*{margin:0;padding:0;box-sizing:border-box;font-family: system-ui;}
+/* ===== 小狗聊天页（依赖 theme.css · 液态玻璃） ===== */
+
 body{
-    background:#1c1614;
-    color:#e8e0d8;
-    min-height:100vh;
-    padding:24px 18px 150px;
+    padding:clamp(22px, 4vh, 30px) clamp(14px, 4vw, 20px) 175px;
     display:flex;
     flex-direction:column;
 }
-.tag{border:1px solid #e8e0d860;padding:8px 12px;width:fit-content;border-radius:4px;font-size:14px;}
-h2{font-size:32px;margin:10px 0;}
-.sub-desc{color:#e8e0d870;margin-bottom:20px;font-size:14px;}
+
+h2{
+    font-size:clamp(24px, 6vw, 30px);
+    font-weight:800;
+    margin:10px 0 6px;
+}
+h2::after{content:"💬";font-size:.62em;margin-left:6px;}
+.sub-desc{
+    color:var(--ink-faint);
+    margin-bottom:clamp(14px, 3vh, 20px);
+    font-size:14px;
+}
 
 /* 消息气泡 */
 .chat-list{
@@ -21,88 +28,114 @@ h2{font-size:32px;margin:10px 0;}
     padding-bottom:12px;
 }
 .msg{
-    max-width:78%;
-    padding:10px 14px;
-    border-radius:14px;
-    line-height:1.5;
+    max-width:min(78%, 480px);
+    padding:12px 16px;
+    border-radius:24px;
+    line-height:1.6;
     white-space:pre-wrap;
     word-break:break-word;
-    font-size:16px;
+    font-size:15px;
+    animation:msgIn .25s ease;
+}
+@keyframes msgIn{
+    from{opacity:0;transform:translateY(8px) scale(.98);}
+    to{opacity:1;transform:none;}
 }
 .msg.me{
     align-self:flex-end;
-    background:#d96b3e;
-    color:#1c1614;
-    border-bottom-right-radius:4px;
+    position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--primary),var(--peach));
+    color:#fff;
+    border-bottom-right-radius:8px;
+    box-shadow:0 8px 22px rgba(244,95,142,.35),
+               inset 0 1px 1px rgba(255,255,255,.5);
+}
+.msg.me::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 50%);
+    pointer-events:none;
 }
 .msg.them{
     align-self:flex-start;
-    background:#2d2522;
-    color:#e8e0d8;
-    border-bottom-left-radius:4px;
+    background:var(--glass-bg-strong);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    color:var(--ink);
+    border-bottom-left-radius:8px;
+    border:1px solid var(--glass-brd);
+    box-shadow:var(--glass-shadow), var(--glass-inset);
 }
 .msg .meta{
     font-size:11px;
-    opacity:.6;
-    margin-top:4px;
+    opacity:.7;
+    margin-top:5px;
     display:flex;
     justify-content:space-between;
     gap:8px;
 }
 .msg-empty{
     margin:auto;
-    color:#e8e0d855;
+    color:var(--ink-faint);
     font-size:14px;
     text-align:center;
     padding:40px 0;
 }
+.msg-empty::before{content:"🐶";display:block;font-size:46px;margin-bottom:10px;}
 
-/* 输入框 */
+/* 输入框：液态玻璃胶囊，悬浮在导航上方 */
 .chat-input{
     position:fixed;
-    left:0;right:0;bottom:58px; /* 底部 tab 栏高度 58 + 内边距 */
-    padding:10px 12px;
-    background:#1c1614;
-    border-top:1px solid #e8e0d820;
+    left:50%;
+    right:auto;
+    margin:0;
+    transform:translateX(-50%);
+    bottom:calc(98px + env(safe-area-inset-bottom, 0px));
+    width:min(460px, calc(100% - 28px));
+    padding:8px 8px 8px 6px;
+    background:var(--glass-bg-strong);
+    backdrop-filter:var(--glass-blur-strong);
+    -webkit-backdrop-filter:var(--glass-blur-strong);
+    border:1px solid var(--glass-brd);
+    border-radius:999px;
+    box-shadow:0 12px 40px rgba(93,63,106,.18), var(--glass-inset);
     display:flex;
-    gap:8px;
+    gap:6px;
+    z-index:60;
 }
 .chat-input input{
     flex:1;
-    padding:12px 14px;
-    border-radius:24px;
-    border:1px solid #e8e0d830;
-    background:#2d2522;
-    color:#e8e0d8;
+    padding:12px 16px;
+    border-radius:999px;
+    border:none;
+    background:transparent;
+    color:var(--ink);
     outline:none;
     font-size:16px;
+    box-shadow:none;
+    margin-bottom:0;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
 }
-.chat-input input:focus{border-color:#d96b3e;}
+.chat-input input::placeholder{color:var(--ink-faint);}
 .chat-input button{
-    padding:0 20px;
-    border-radius:24px;
+    padding:0 22px;
+    border-radius:999px;
     border:none;
-    background:#d96b3e;
-    color:#1c1614;
-    font-weight:bold;
+    position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--primary),var(--peach));
+    color:#fff;
+    font-weight:700;
     font-size:15px;
-}
-.chat-input button:disabled{opacity:.5;}
-
-/* 底部导航栏 */
-.tab-bar{
-    position:fixed;
-    left:0;right:0;bottom:0;
-    display:flex;
-    border-top:1px solid #e8e0d830;
-    background:#1c1614;
-    z-index:5;
-}
-.tab-item{
-    flex:1;
-    text-align:center;
-    padding:16px 0;
-    font-size:14px;
     cursor:pointer;
+    box-shadow:0 6px 16px rgba(244,95,142,.4), inset 0 1px 1px rgba(255,255,255,.5);
+    transition:transform .15s ease;
 }
-.tab-active{font-weight:bold;color:#f2c288;}
+.chat-input button::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 52%);
+    pointer-events:none;
+}
+.chat-input button:active{transform:scale(.94);}
+.chat-input button:disabled{opacity:.5;}

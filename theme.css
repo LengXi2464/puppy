@@ -1,0 +1,237 @@
+/* ============================================================
+   主题 v2：液态玻璃 · 苹果风（Liquid Glass）
+   共享设计变量 + 玻璃材质 + 底部导航 + 自适应容器
+   四个页面均先引入本文件，再引入各自页面样式
+   ============================================================ */
+
+:root{
+    /* 墨色：深梅紫，玻璃上更清晰的对比 */
+    --ink:#46304a;
+    --ink-soft:rgba(70,48,74,.62);
+    --ink-faint:rgba(70,48,74,.42);
+
+    /* 主色：樱粉→蜜桃 */
+    --primary:#ff8fb3;
+    --primary-deep:#f45f8e;
+    --peach:#ffb28c;
+    --lavender:#c3b5f5;
+
+    /* 液态玻璃材质 */
+    --glass-bg:rgba(255,255,255,.52);
+    --glass-bg-strong:rgba(255,255,255,.68);
+    --glass-brd:rgba(255,255,255,.78);
+    --glass-shadow:0 8px 32px rgba(93,63,106,.12);
+    --glass-inset:inset 0 1px 0 rgba(255,255,255,.9);
+    --glass-blur:blur(24px) saturate(170%);
+    --glass-blur-strong:blur(32px) saturate(180%);
+
+    --line:rgba(255,143,179,.28);
+    --shadow-soft:0 4px 14px rgba(93,63,106,.10);
+}
+
+*{
+    margin:0;padding:0;box-sizing:border-box;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",
+        "PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",system-ui,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    color:var(--ink);
+    min-height:100vh;
+    min-height:100dvh;
+    background:linear-gradient(165deg,#fff6fa 0%,#fff3ec 52%,#f2effe 100%) fixed;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+}
+
+/* —— 动态背景光斑：玻璃质感的灵魂，玻璃元素模糊的就是它们 —— */
+html::before, body::before, body::after{
+    content:"";
+    position:fixed;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:0;
+    filter:blur(64px);
+}
+html::before{
+    width:440px;height:440px;top:-140px;right:-120px;
+    background:radial-gradient(circle at 40% 40%, #ffb6d5, transparent 66%);
+    animation:blobFloat 18s ease-in-out infinite alternate;
+}
+body::before{
+    width:400px;height:400px;bottom:-130px;left:-130px;
+    background:radial-gradient(circle at 55% 45%, #ffd2b8, transparent 66%);
+    animation:blobFloat 24s ease-in-out -8s infinite alternate-reverse;
+}
+body::after{
+    width:340px;height:340px;top:38%;left:58%;
+    background:radial-gradient(circle at 50% 50%, #c9d4ff, transparent 66%);
+    animation:blobFloat 28s ease-in-out -14s infinite alternate;
+}
+@keyframes blobFloat{
+    from{transform:translate(0,0) scale(1);}
+    to{transform:translate(-44px,34px) scale(1.16);}
+}
+
+/* —— 自适应：内容列居中（全屏层除外），并抬到光斑之上 —— */
+body > div:not(.tab-bar):not(.camera-box):not(.poster-box):not(.batch-modal):not(.export-modal):not(.preview-mask),
+body > h1, body > h2, body > p, body > label, body > input, body > button, body > form{
+    position:relative;
+    z-index:1;
+    max-width:620px;
+    margin-left:auto;
+    margin-right:auto;
+}
+/* input/button 默认 inline-block，margin:auto 不居中；转 block 后才能在列内居中 */
+body > input, body > button{
+    display:block;
+}
+
+/* —— 状态小标签：玻璃胶囊 —— */
+.tag{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--glass-bg);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    border:1px solid var(--glass-brd);
+    color:var(--primary-deep);
+    padding:8px 18px;width:fit-content;
+    border-radius:999px;
+    font-size:14px;font-weight:600;
+    box-shadow:var(--glass-shadow), var(--glass-inset);
+}
+
+/* —— 主按钮：粉桃渐变 + 顶部高光（玻璃光泽感） —— */
+.btn-orange{
+    width:100%;
+    position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--primary) 0%,var(--peach) 100%);
+    color:#fff;
+    font-weight:700;
+    font-size:clamp(17px, 4.4vw, 19px);
+    letter-spacing:2px;
+    border:none;
+    padding:clamp(15px, 4.2vw, 18px);
+    border-radius:22px;
+    cursor:pointer;
+    box-shadow:0 12px 28px rgba(244,95,142,.35),
+               inset 0 1px 1px rgba(255,255,255,.65),
+               inset 0 -1px 2px rgba(255,255,255,.2);
+    transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-orange::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 52%);
+    pointer-events:none;
+}
+.btn-orange:active{transform:scale(.97);}
+
+/* —— 次按钮：真正的液态玻璃 —— */
+.btn-secondary{
+    width:100%;
+    margin-top:14px;
+    background:var(--glass-bg);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    color:var(--primary-deep);
+    font-weight:600;
+    font-size:clamp(15px, 4vw, 16px);
+    border:1px solid var(--glass-brd);
+    padding:clamp(14px, 4vw, 16px);
+    border-radius:20px;
+    cursor:pointer;
+    box-shadow:var(--glass-shadow), var(--glass-inset);
+    transition:transform .15s ease, background .2s ease;
+}
+.btn-secondary:active{transform:scale(.98);background:rgba(255,255,255,.68);}
+
+/* —— 幽灵按钮（数据管理页用） —— */
+.btn-ghost{
+    width:100%;
+    margin-top:8px;
+    background:var(--glass-bg);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    color:var(--primary-deep);
+    font-weight:600;
+    font-size:clamp(15px, 4vw, 16px);
+    border:1px solid var(--glass-brd);
+    padding:clamp(14px, 4vw, 16px);
+    border-radius:20px;
+    cursor:pointer;
+    box-shadow:var(--glass-shadow), var(--glass-inset);
+    transition:transform .15s ease;
+}
+.btn-ghost:active{transform:scale(.98);}
+
+/* —— 底部导航：液态玻璃悬浮胶囊 —— */
+.tab-bar{
+    position:fixed;
+    left:50%;transform:translateX(-50%);
+    bottom:calc(14px + env(safe-area-inset-bottom, 0px));
+    width:min(460px, calc(100% - 28px));
+    display:flex;
+    background:var(--glass-bg-strong);
+    backdrop-filter:var(--glass-blur-strong);
+    -webkit-backdrop-filter:var(--glass-blur-strong);
+    border:1px solid var(--glass-brd);
+    border-radius:28px;
+    box-shadow:0 12px 40px rgba(93,63,106,.18), var(--glass-inset);
+    padding:8px;
+    z-index:50;
+    overflow:hidden;
+}
+/* 顶部流光 */
+.tab-bar::before{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0) 46%);
+    pointer-events:none;
+}
+.tab-item{
+    flex:1;
+    position:relative;
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    border-radius:20px;
+    padding:6px 0 5px;
+    transition:background .25s ease, color .25s ease;
+    user-select:none;
+}
+.tab-item::before{
+    content:attr(data-icon);
+    display:block;
+    font-size:19px;
+    margin-bottom:2px;
+    filter:grayscale(1);
+    opacity:.55;
+    transition:filter .25s ease, opacity .25s ease, transform .25s ease;
+}
+.tab-item:active{background:rgba(255,143,179,.10);}
+.tab-active{
+    color:var(--primary-deep);
+    font-weight:700;
+    background:rgba(255,255,255,.6);
+    box-shadow:0 4px 14px rgba(244,95,142,.22), inset 0 1px 0 rgba(255,255,255,.95);
+}
+.tab-active::before{filter:none;opacity:1;transform:translateY(-1px) scale(1.08);}
+
+/* —— 通用弹窗遮罩：深色玻璃 —— */
+.mask-dim{
+    position:fixed;inset:0;
+    background:rgba(70,48,74,.38);
+    backdrop-filter:blur(10px) saturate(140%);
+    -webkit-backdrop-filter:blur(10px) saturate(140%);
+    z-index:200;
+    display:flex;align-items:center;justify-content:center;
+    padding:18px;
+}
+
+/* —— 减弱动态效果偏好 —— */
+@media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important;}
+}

@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小狗打卡器</title>
+    <link rel="stylesheet" href="theme.css">
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <div class="box-icon"></div>
+    <div class="box-icon">🐶</div>
     <h1>小狗打卡器</h1>
     <p class="desc">每天吐舌头拍一张，选最好看的打卡。日历记着，海报给爸爸和小狗各一版。</p>
 
@@ -23,13 +24,13 @@
 
     <div class="tools-section">
         <h3>数据管理</h3>
-        <button class="btn-ghost" onclick="exportAllToTG()">📤 打包全部打卡内容到TG频道</button>
-        <p class="tool-note">把你这个设备上的所有照片/视频，按日期分文件夹打成 zip（按 ~48MB 切分），通过机器人发到 Telegram 频道。<br>每条记录都会在 zip 里存一份原件。</p>
+        <button class="btn-ghost" onclick="exportAllToTG()">📤 打包全部打卡内容到Kuro</button>
+        <p class="tool-note">把你这个设备上的所有照片/视频，按日期分文件夹打包成 <b>1 个 zip</b>（不二次压缩，保留原件）→ 上传到你的图床 → 在Kuro只发 <b>1 条消息</b>（带 zip 下载链接）。<br>不受 50MB 限制，多大的 zip 都行，上限是你浏览器内存和图床存储。</p>
     </div>
 
     <div class="export-modal" id="exportModal" style="display:none;">
         <div class="export-inner">
-            <h3 id="exportTitle">打包全部到 TG</h3>
+            <h3 id="exportTitle">打包全部到 Kuro</h3>
             <div class="export-stats" id="exportStats"></div>
             <div class="batch-progress"><div id="exportBar"></div></div>
             <p class="batch-sub" id="exportSub"></p>
@@ -37,14 +38,14 @@
         </div>
     </div>
 
-    <p class="bottom-note">可安装到手机主屏幕·照片上传至图床，失败时存本地</p>
+    <p class="bottom-note">可安装到手机主屏幕·照片上传至Kuro，失败时存本地</p>
 
     <!-- 底部导航 -->
     <div class="tab-bar">
-        <div class="tab-item" onclick="location.href='home.html'">今日拍照</div>
-        <div class="tab-item" onclick="location.href='calendar.html'">打卡日历</div>
-        <div class="tab-item" onclick="location.href='chat.html'">小狗聊天</div>
-        <div class="tab-item tab-active">我的</div>
+        <div class="tab-item" data-icon="📷" onclick="location.href='home.html'">今日拍照</div>
+        <div class="tab-item" data-icon="📅" onclick="location.href='calendar.html'">打卡日历</div>
+        <div class="tab-item" data-icon="💬" onclick="location.href='chat.html'">小狗聊天</div>
+        <div class="tab-item tab-active" data-icon="🐾">我的</div>
     </div>
 
 <script src="db.js"></script>

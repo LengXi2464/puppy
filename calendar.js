@@ -1,5 +1,20 @@
-const config = JSON.parse(localStorage.getItem("puppyConfig"));
-document.getElementById("sloganText").innerText = `我是${config.dad}爸爸的小狗${config.puppy}`;
+// 读取昵称配置（无配置时回落到 Kuro/Puppy，避免脚本第一行报错导致日历完全不渲染）
+let config = null;
+try { config = JSON.parse(localStorage.getItem("puppyConfig") || "null"); } catch(e) {}
+if (!config) config = { dad: "Kuro", puppy: "Puppy" };
+const sloganEl = document.getElementById("sloganText");
+if (sloganEl) sloganEl.innerText = `我是${config.dad}爸爸的小狗${config.puppy}`;
+
+// db.js 里的辅助函数（imgURL）来自 db.js，它的调用点要确认函数已挂载
+// 兜底：如果 db.js 没加载或 imgURL/dbGetAll 不存在，就给一个不中断渲染的默认值
+function safeImgURL(ref){
+    if (typeof imgURL === "function") return imgURL(ref);
+    return (typeof ref === "string") ? ref : "#";
+}
+function safeDbGetAll(){
+    if (typeof dbGetAll === "function") return dbGetAll();
+    return Promise.resolve([]);
+}
 
 // 判断记录是不是视频（老记录没有 type 字段 → 按图片处理，向后兼容）
 function isVideoRec(r){
@@ -36,7 +51,7 @@ function openPreview(records){
         idx = (i + list.length) % list.length;
         stage.innerHTML = "";
         const r = list[idx];
-        const url = imgURL(r.img);
+        const url = safeImgURL(r.img);
         if(isVideoRec(r)){
             const v = document.createElement("video");
             v.controls = true; v.playsInline = true; v.preload = "auto"; v.src = url;
@@ -61,7 +76,7 @@ function openPreview(records){
             const ico = document.createElement("div");
             ico.className = "strip-play"; it.appendChild(ico);
         }else{
-            it.style.backgroundImage = `url(${imgURL(r.img)})`;
+            it.style.backgroundImage = `url(${safeImgURL(r.img)})`;
         }
         it.onclick = () => show(i);
         strip.appendChild(it);
@@ -91,8 +106,10 @@ function openPreview(records){
 
 // 简易日历渲染（当月日期）
 async function renderCalendar(){
-    const records = await dbGetAll();
+    let records = [];
+    try { records = await safeDbGetAll(); } catch (e) { records = []; }
     const box = document.getElementById("calendarBox");
+    if (!box) return;
     box.innerHTML = "";
     const now = new Date();
     const year = now.getFullYear();
@@ -122,7 +139,7 @@ async function renderCalendar(){
                 div.appendChild(icon);
             }else{
                 div.classList.add("has-img");
-                div.style.backgroundImage = `url(${imgURL(first.img)})`;
+                div.style.backgroundImage = `url(${safeImgURL(first.img)})`;
             }
             if(dayRecords.length > 1){
                 const badge = document.createElement("div");
@@ -136,4 +153,8 @@ async function renderCalendar(){
         box.appendChild(div);
     }
 }
-renderCalendar();
+// 启动渲染，任何报错都不让页面白屏
+renderCalendar().catch((e) => {
+    const box = document.getElementById("calendarBox");
+    if (box) box.innerText = "日历加载失败：" + String(e?.message || e) + "（可刷新重试）";
+});
