@@ -19,6 +19,17 @@ h2{font-size:44px;margin:12px 0;}
     padding:20px;
     border-radius:4px;
 }
+.btn-secondary{
+    width:100%;
+    margin-top:14px;
+    background:#2d2522;
+    color:#f2c288;
+    font-weight:bold;
+    font-size:18px;
+    border:1px solid #e8e0d830;
+    padding:16px;
+    border-radius:4px;
+}
 /* 底部导航栏 */
 .tab-bar{
     position:fixed;
@@ -32,7 +43,8 @@ h2{font-size:44px;margin:12px 0;}
 .tab-item{
     flex:1;
     text-align:center;
-    padding:16px 0;
+    padding:12px 0;
+    font-size:13px;
 }
 .tab-active{font-weight:bold;}
 
@@ -44,6 +56,63 @@ h2{font-size:44px;margin:12px 0;}
     display:none;
 }
 video{width:100%;transform: scaleX(-1); /*前置镜像*/}
+
+/* 拍照 / 录像 模式切换 */
+.mode-tabs{
+    position:absolute;
+    top:16px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:6px;
+    background:#0008;
+    padding:4px;
+    border-radius:999px;
+    backdrop-filter:blur(10px);
+}
+.mode-tab{
+    background:transparent;
+    border:none;
+    color:#fff;
+    padding:8px 20px;
+    border-radius:999px;
+    font-size:15px;
+    opacity:.7;
+}
+.mode-tab.active{
+    background:#fff;
+    color:#111;
+    opacity:1;
+    font-weight:bold;
+}
+
+/* 录制中指示灯 */
+.rec-indicator{
+    position:absolute;
+    top:68px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#000a;
+    padding:6px 14px;
+    border-radius:999px;
+    color:#fff;
+    font-size:14px;
+    font-variant-numeric:tabular-nums;
+}
+.rec-dot{
+    width:12px;height:12px;
+    background:#ff3b30;
+    border-radius:50%;
+    animation: recPulse 1.2s ease-in-out infinite;
+}
+@keyframes recPulse{
+    0%,100%{opacity:1;transform:scale(1);}
+    50%{opacity:.35;transform:scale(.75);}
+}
+
 .camera-bottom{
     position:absolute;
     bottom:30px;
@@ -51,6 +120,7 @@ video{width:100%;transform: scaleX(-1); /*前置镜像*/}
     padding:0 16px;
 }
 .photo-canvas{display:none;}
+.camera-bottom h3{color:#fff;margin-bottom:4px;font-size:16px;}
 
 /* 海报弹窗 */
 .poster-box{
@@ -63,14 +133,66 @@ video{width:100%;transform: scaleX(-1); /*前置镜像*/}
     overflow:auto;
 }
 .poster-box h2{flex-shrink:0;}
-.poster-img{
+.poster-media{
     width:100%;
     flex:1;
     min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.poster-img, .poster-video{
+    width:100%;
+    max-height:100%;
     object-fit:contain;
     border:12px solid #222;
+    border-radius:2px;
 }
+.poster-video{background:#000;}
 .btn-row{display:flex;gap:12px;margin-top:30px;flex-shrink:0;}
 .btn-row button{flex:1;padding:18px;border:none;font-size:18px;border-radius:4px;}
 .poster-box .btn-close{flex-shrink:0;}
 .btn-row button.active{outline:3px solid #e8e0d8;outline-offset:-6px;}
+
+/* 批量补传弹窗 */
+.batch-modal{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.85);
+    z-index:200;
+    display:flex;align-items:center;justify-content:center;
+    padding:18px;
+}
+.batch-inner{
+    width:100%;max-width:480px;
+    background:#1c1614;
+    border:1px solid #e8e0d825;
+    border-radius:14px;
+    padding:22px;
+    color:#e8e0d8;
+}
+.batch-inner h3{font-size:22px;margin-bottom:12px;}
+.batch-stats{
+    font-size:15px;margin-bottom:12px;line-height:1.7;
+}
+.batch-stats b{color:#f2c288;}
+.batch-progress{
+    width:100%;height:10px;
+    background:#e8e0d815;border-radius:999px;overflow:hidden;margin-bottom:8px;
+}
+.batch-progress>div{
+    height:100%;width:0%;background:linear-gradient(90deg,#d96b3e,#f2c288);
+    transition:width .25s ease;
+}
+.batch-sub{font-size:13px;color:#e8e0d870;margin-bottom:14px;min-height:1.5em;line-height:1.6;}
+.batch-modal textarea{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #e8e0d830;
+    background:#2d2522;color:#e8e0d8;font-size:14px;
+    resize:vertical;outline:none;
+    margin-bottom:16px;
+}
+.batch-modal textarea:focus{border-color:#d96b3e;}
+.batch-actions{display:flex;gap:10px;}
+.batch-actions button[disabled]{opacity:.5;cursor:not-allowed;}

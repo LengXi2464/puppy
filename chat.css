@@ -1,0 +1,108 @@
+*{margin:0;padding:0;box-sizing:border-box;font-family: system-ui;}
+body{
+    background:#1c1614;
+    color:#e8e0d8;
+    min-height:100vh;
+    padding:24px 18px 150px;
+    display:flex;
+    flex-direction:column;
+}
+.tag{border:1px solid #e8e0d860;padding:8px 12px;width:fit-content;border-radius:4px;font-size:14px;}
+h2{font-size:32px;margin:10px 0;}
+.sub-desc{color:#e8e0d870;margin-bottom:20px;font-size:14px;}
+
+/* 消息气泡 */
+.chat-list{
+    flex:1;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding-bottom:12px;
+}
+.msg{
+    max-width:78%;
+    padding:10px 14px;
+    border-radius:14px;
+    line-height:1.5;
+    white-space:pre-wrap;
+    word-break:break-word;
+    font-size:16px;
+}
+.msg.me{
+    align-self:flex-end;
+    background:#d96b3e;
+    color:#1c1614;
+    border-bottom-right-radius:4px;
+}
+.msg.them{
+    align-self:flex-start;
+    background:#2d2522;
+    color:#e8e0d8;
+    border-bottom-left-radius:4px;
+}
+.msg .meta{
+    font-size:11px;
+    opacity:.6;
+    margin-top:4px;
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+}
+.msg-empty{
+    margin:auto;
+    color:#e8e0d855;
+    font-size:14px;
+    text-align:center;
+    padding:40px 0;
+}
+
+/* 输入框 */
+.chat-input{
+    position:fixed;
+    left:0;right:0;bottom:58px; /* 底部 tab 栏高度 58 + 内边距 */
+    padding:10px 12px;
+    background:#1c1614;
+    border-top:1px solid #e8e0d820;
+    display:flex;
+    gap:8px;
+}
+.chat-input input{
+    flex:1;
+    padding:12px 14px;
+    border-radius:24px;
+    border:1px solid #e8e0d830;
+    background:#2d2522;
+    color:#e8e0d8;
+    outline:none;
+    font-size:16px;
+}
+.chat-input input:focus{border-color:#d96b3e;}
+.chat-input button{
+    padding:0 20px;
+    border-radius:24px;
+    border:none;
+    background:#d96b3e;
+    color:#1c1614;
+    font-weight:bold;
+    font-size:15px;
+}
+.chat-input button:disabled{opacity:.5;}
+
+/* 底部导航栏 */
+.tab-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    display:flex;
+    border-top:1px solid #e8e0d830;
+    background:#1c1614;
+    z-index:5;
+}
+.tab-item{
+    flex:1;
+    text-align:center;
+    padding:16px 0;
+    font-size:14px;
+    cursor:pointer;
+}
+.tab-active{font-weight:bold;color:#f2c288;}

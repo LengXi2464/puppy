@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小狗聊天</title>
+    <link rel="stylesheet" href="chat.css">
+</head>
+<body>
+    <div>
+        <p class="tag">和爸爸/小狗说话</p>
+        <h2>小狗聊天</h2>
+        <p class="sub-desc" id="connStatus">连接中…</p>
+    </div>
+
+    <!-- 消息列表 -->
+    <div id="chatList" class="chat-list"></div>
+
+    <!-- 输入框 -->
+    <form id="chatForm" class="chat-input" onsubmit="sendMsg(event)">
+        <input id="chatText" autocomplete="off" placeholder="说点什么…" maxlength="2000"/>
+        <button type="submit">发送</button>
+    </form>
+
+    <!-- 底部导航 -->
+    <div class="tab-bar">
+        <div class="tab-item" onclick="location.href='home.html'">今日拍照</div>
+        <div class="tab-item" onclick="location.href='calendar.html'">打卡日历</div>
+        <div class="tab-item tab-active">小狗聊天</div>
+        <div class="tab-item" onclick="location.href='index.html?edit'">我的</div>
+    </div>
+
+<script>
+// Pages Functions 部署后会自动挂在 /api/*，与前端同源
+const CHAT_ENDPOINT = "/api";
+</script>
+<script src="chat.js"></script>
+</body>
+</html>

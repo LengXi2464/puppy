@@ -13,24 +13,55 @@
         <p class="slogan" id="slogan">我是Kuro爸爸的小狗Puppy</p>
         <p class="sub-desc">吐舌头拍几张，选最好看的一张再打卡·将用前置摄像头</p>
         <button class="btn-orange" onclick="openCamera()">打开相机</button>
+        <button class="btn-secondary" onclick="document.getElementById('batchFile').click()">📁 从相册选照片/视频补传</button>
+        <input type="file" id="batchFile" multiple accept="image/*,video/*" style="display:none" onchange="onBatchPick(this.files)"/>
+    </div>
+
+    <!-- 批量上传进度弹层 -->
+    <div class="batch-modal" id="batchModal" style="display:none;">
+        <div class="batch-inner">
+            <h3 id="batchTitle">批量补传</h3>
+            <div class="batch-stats" id="batchStats"></div>
+            <div class="batch-progress"><div id="batchBar"></div></div>
+            <p class="batch-sub" id="batchSub"></p>
+            <textarea id="batchCaption" placeholder="可选：打包发送时的说明文字，比如「8月补传」" rows="3"></textarea>
+            <div class="batch-actions">
+                <button style="flex:1;padding:14px;background:#333;color:#fff;border:none;border-radius:6px;" onclick="cancelBatch()">取消</button>
+                <button id="batchZipBtn" style="flex:1;padding:14px;background:#d96b3e;color:#000;font-weight:bold;border:none;border-radius:6px;" onclick="finalizeBatch()">完成·打包发到TG</button>
+            </div>
+        </div>
     </div>
 
     <!-- 底部导航 -->
     <div class="tab-bar">
         <div class="tab-item tab-active">今日拍照</div>
         <div class="tab-item" onclick="location.href='calendar.html'">打卡日历</div>
+        <div class="tab-item" onclick="location.href='chat.html'">小狗聊天</div>
         <div class="tab-item" onclick="location.href='index.html?edit'">我的</div>
     </div>
 
     <!-- 相机界面 -->
     <div class="camera-box" id="cameraWrap">
-        <video id="video" autoplay playsinline></video>
+        <video id="video" autoplay playsinline muted></video>
         <canvas class="photo-canvas" id="canvas"></canvas>
+
+        <!-- 拍照 / 录像 模式切换 -->
+        <div class="mode-tabs">
+            <button class="mode-tab active" id="modePhoto" onclick="setMode('photo')">拍照</button>
+            <button class="mode-tab" id="modeVideo" onclick="setMode('video')">录像</button>
+        </div>
+
+        <!-- 录制中指示灯（录像模式才显示） -->
+        <div class="rec-indicator" id="recIndicator" style="display:none;">
+            <span class="rec-dot"></span>
+            <span id="recTimer">00:00</span>
+        </div>
+
         <div class="camera-bottom">
             <h3 id="cameraTip">准备拍照</h3>
             <div style="display:flex;gap:10px;margin-top:20px;">
                 <button style="width:25%;padding:16px;">前置</button>
-                <button style="flex:1;padding:16px;background:#f2c288;color:#000;font-weight:bold;" onclick="takePicture()">拍照</button>
+                <button style="flex:1;padding:16px;background:#f2c288;color:#000;font-weight:bold;" id="btnCapture" onclick="onCaptureClick()">拍照</button>
                 <button style="flex:1;padding:16px;background:#80492f;" onclick="checkIn()">打卡</button>
             </div>
         </div>
@@ -39,7 +70,10 @@
     <!-- 海报弹窗 -->
     <div class="poster-box" id="posterWrap">
         <h2 id="posterTitle">海报标题</h2>
-        <img class="poster-img" id="posterImg"/>
+        <div class="poster-media">
+            <img class="poster-img" id="posterImg"/>
+            <video class="poster-video" id="posterVideo" controls playsinline preload="metadata"></video>
+        </div>
         <div class="btn-row">
             <button id="btnPuppy" style="background:#d96b3e" onclick="setPosterMode('puppy')">小狗版海报</button>
             <button id="btnDad" style="background:#e2bc86" onclick="setPosterMode('dad')">爸爸版海报</button>
@@ -48,6 +82,7 @@
     </div>
 
 <script src="db.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="home.js"></script>
 </body>
 </html>

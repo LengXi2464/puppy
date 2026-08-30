@@ -3,7 +3,7 @@ body{
     background: #141414;
     color:#e8e0d8;
     min-height:100vh;
-    padding:40px 24px;
+    padding:40px 24px 100px;
 }
 .box-icon{
     width:64px;
@@ -49,8 +49,78 @@ input{
     padding:18px;
     border-radius:4px;
 }
+.btn-ghost{
+    width:100%;
+    margin-top:8px;
+    background:#2d2522;
+    color:#f2c288;
+    font-weight:bold;
+    font-size:17px;
+    border:1px solid #e8e0d825;
+    padding:16px;
+    border-radius:6px;
+    cursor:pointer;
+}
+.btn-ghost:active{transform:scale(.98);}
+.tools-section{
+    margin-top:30px;
+    padding-top:24px;
+    border-top:1px solid #e8e0d820;
+}
+.tools-section h3{
+    font-size:18px;margin-bottom:12px;color:#f2c288;
+}
+.tool-note{
+    color:#e8e0d860;font-size:13px;line-height:1.7;margin-top:12px;
+}
+.batch-progress{
+    width:100%;height:10px;
+    background:#e8e0d815;border-radius:999px;overflow:hidden;margin:8px 0;
+}
+.batch-progress>div{
+    height:100%;width:0%;background:linear-gradient(90deg,#d96b3e,#f2c288);
+    transition:width .25s ease;
+}
+.batch-sub{font-size:13px;color:#e8e0d870;min-height:1.5em;line-height:1.6;}
+.export-modal{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.85);
+    z-index:200;
+    display:flex;align-items:center;justify-content:center;
+    padding:18px;
+}
+.export-inner{
+    width:100%;max-width:480px;
+    background:#1c1614;
+    border:1px solid #e8e0d825;
+    border-radius:14px;
+    padding:22px;
+    color:#e8e0d8;
+}
+.export-inner h3{font-size:22px;margin-bottom:12px;}
+.export-stats{font-size:15px;line-height:1.7;margin-bottom:6px;}
+.export-stats b{color:#f2c288;}
 .bottom-note{
     text-align:center;
     color:#777;
     margin-top:30px;
 }
+/* 底部导航栏 */
+.tab-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    width:100%;
+    display:flex;
+    border-top:1px solid #e8e0d830;
+    background:#141414;
+    z-index:5;
+}
+.tab-item{
+    flex:1;
+    text-align:center;
+    padding:12px 0;
+    font-size:13px;
+    cursor:pointer;
+    color:#e8e0d8;
+}
+.tab-active{font-weight:bold;color:#f2c288;}
