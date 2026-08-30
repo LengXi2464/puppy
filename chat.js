@@ -34,14 +34,34 @@ function renderMsgs(msgs) {
     }
     for (const m of msgs) {
         const isMe = m.from === "puppy";
-        const el = document.createElement("div");
-        el.className = "msg " + (isMe ? "me" : "them");
-        el.textContent = m.text;
+        // 微信式一行：头像 + 气泡（自己在右，对方在左）
+        const row = document.createElement("div");
+        row.className = "msg-row " + (isMe ? "me" : "them");
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        if (isMe) {
+            avatar.textContent = "🐶";
+        } else {
+            // 对方头像显示昵称首字符（如 Kuro → K）
+            const who = String(m.who || "群").trim();
+            avatar.textContent = who.charAt(0).toUpperCase() || "群";
+        }
+
+        const bubble = document.createElement("div");
+        bubble.className = "msg";
+        const text = document.createElement("div");
+        text.className = "msg-text";
+        text.textContent = m.text;
         const meta = document.createElement("div");
         meta.className = "meta";
-        meta.innerHTML = `<span>${escapeHtml(m.who || (isMe ? "APP" : "群"))}</span><span>${fmtTime(m.ts)}</span>`;
-        el.appendChild(meta);
-        listDom.appendChild(el);
+        meta.innerHTML = `<span>${escapeHtml(isMe ? "APP" : (m.who || "群"))}</span><span>${fmtTime(m.ts)}</span>`;
+        bubble.appendChild(text);
+        bubble.appendChild(meta);
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        listDom.appendChild(row);
     }
     listDom.scrollTop = listDom.scrollHeight;
 }

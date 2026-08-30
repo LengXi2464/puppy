@@ -18,19 +18,51 @@ h2::after{content:"💬";font-size:.62em;margin-left:6px;}
     font-size:14px;
 }
 
-/* 消息气泡 */
+/* 消息区：微信式 头像 + 气泡，自适应宽度 */
 .chat-list{
     flex:1;
+    min-height:0;
     overflow-y:auto;
     display:flex;
     flex-direction:column;
-    gap:10px;
-    padding-bottom:12px;
+    gap:14px;
+    padding:4px 2px 12px;
 }
+/* 桌面端聊天列比其他页更宽一点，手机端自动占满 */
+body > div.chat-list{ max-width:min(760px, 100%); }
+
+.msg-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+}
+.msg-row.me{ flex-direction:row-reverse; }   /* 自己：头像在右 */
+
+.avatar{
+    flex:0 0 40px;
+    width:40px;height:40px;
+    border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;font-weight:700;
+    background:var(--glass-bg-strong);
+    border:1px solid var(--glass-brd);
+    box-shadow:var(--glass-inset);
+    color:var(--ink-soft);
+    user-select:none;
+    overflow:hidden;
+    flex-shrink:0;
+}
+.msg-row.me .avatar{
+    background:linear-gradient(135deg,var(--primary),var(--peach));
+    color:#fff;border:none;
+    box-shadow:0 4px 12px rgba(244,95,142,.3);
+}
+
 .msg{
-    max-width:min(86%, 560px);
-    padding:14px 18px;
-    border-radius:26px;
+    min-width:120px;
+    max-width:min(72%, 520px);
+    padding:12px 16px;
+    border-radius:4px 18px 18px 18px;   /* 左上直角，朝向头像 */
     line-height:1.6;
     white-space:pre-wrap;
     word-break:break-word;
@@ -41,40 +73,42 @@ h2::after{content:"💬";font-size:.62em;margin-left:6px;}
     from{opacity:0;transform:translateY(8px) scale(.98);}
     to{opacity:1;transform:none;}
 }
-.msg.me{
-    align-self:flex-end;
+.msg-row.me .msg{
+    border-radius:18px 4px 18px 18px;   /* 右上直角 */
     position:relative;overflow:hidden;
     background:linear-gradient(135deg,var(--primary),var(--peach));
     color:#fff;
-    border-bottom-right-radius:8px;
     box-shadow:0 8px 22px rgba(244,95,142,.35),
                inset 0 1px 1px rgba(255,255,255,.5);
 }
-.msg.me::after{
+.msg-row.me .msg::after{
     content:"";
     position:absolute;inset:0;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 50%);
     pointer-events:none;
 }
-.msg.them{
-    align-self:flex-start;
+.msg-row.them .msg{
     background:var(--glass-bg-strong);
     backdrop-filter:var(--glass-blur);
     -webkit-backdrop-filter:var(--glass-blur);
     color:var(--ink);
-    border-bottom-left-radius:8px;
     border:1px solid var(--glass-brd);
     box-shadow:var(--glass-shadow), var(--glass-inset);
 }
 .msg .meta{
     font-size:12px;
     opacity:.7;
-    margin-top:6px;
+    margin-top:5px;
     display:flex;
     justify-content:space-between;
     gap:10px;
-    /* 禁止换行：短消息时「APP」和时间也不会被挤成竖排 */
+    /* 禁止换行：短消息时昵称和时间也不会被挤成竖排 */
     white-space:nowrap;
+}
+/* 手机端自适应：气泡占屏更大、头像略小 */
+@media (max-width:640px){
+    .msg{ max-width:76%; padding:12px 14px; }
+    .avatar{ flex-basis:36px; width:36px; height:36px; font-size:16px; }
 }
 .msg-empty{
     margin:auto;
@@ -93,7 +127,7 @@ h2::after{content:"💬";font-size:.62em;margin-left:6px;}
     margin:0;
     transform:translateX(-50%);
     bottom:calc(106px + env(safe-area-inset-bottom, 0px));
-    width:min(560px, calc(100% - 28px));
+    width:min(760px, calc(100% - 28px));
     padding:10px 10px 10px 8px;
     background:var(--glass-bg-strong);
     backdrop-filter:var(--glass-blur-strong);
