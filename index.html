@@ -22,23 +22,7 @@
 
     <button class="btn-start" onclick="saveInfo()">开始当小狗</button>
 
-    <div class="tools-section">
-        <h3>数据管理</h3>
-        <button class="btn-ghost" onclick="exportAllToTG()">📤 打包全部打卡内容到Kuro</button>
-        <p class="tool-note">把你这个设备上的所有照片/视频，按日期分文件夹打包成 <b>1 个 zip</b>（不二次压缩，保留原件）→ 上传到你的图床 → 在Kuro只发 <b>1 条消息</b>（带 zip 下载链接）。<br>不受 50MB 限制，多大的 zip 都行，上限是你浏览器内存和图床存储。</p>
-    </div>
-
-    <div class="export-modal" id="exportModal" style="display:none;">
-        <div class="export-inner">
-            <h3 id="exportTitle">打包全部到 Kuro</h3>
-            <div class="export-stats" id="exportStats"></div>
-            <div class="batch-progress"><div id="exportBar"></div></div>
-            <p class="batch-sub" id="exportSub"></p>
-            <button class="btn-ghost" style="width:100%;margin-top:16px;" onclick="closeExport()">关闭</button>
-        </div>
-    </div>
-
-    <p class="bottom-note">可安装到手机主屏幕·照片上传至Kuro，失败时存本地</p>
+            <p class="bottom-note">可安装到手机主屏幕·照片存本地</p>
 
     <!-- 底部导航 -->
     <div class="tab-bar">
@@ -48,7 +32,6 @@
     </div>
 
 <script src="db.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="index.js"></script>
 </body>
 </html>
