@@ -14,23 +14,6 @@
         <p class="slogan" id="slogan">我是Kuro爸爸的小狗Puppy</p>
         <p class="sub-desc" id="subDesc">吐舌头拍几张，选最好看的一张再打卡·将用前置摄像头</p>
         <button class="btn-orange" onclick="startCamera()">📷 打开相机</button>
-        <button class="btn-secondary" onclick="document.getElementById('batchFile').click()">📁 从相册选照片/视频补传</button>
-        <input type="file" id="batchFile" multiple accept="image/*,video/*" style="display:none" onchange="onBatchPick(this.files)"/>
-    </div>
-
-    <!-- 批量上传进度弹层 -->
-    <div class="batch-modal" id="batchModal" style="display:none;">
-        <div class="batch-inner">
-            <h3 id="batchTitle">批量补传</h3>
-            <div class="batch-stats" id="batchStats"></div>
-            <div class="batch-progress"><div id="batchBar"></div></div>
-            <p class="batch-sub" id="batchSub"></p>
-            <textarea id="batchCaption" placeholder="可选：打包发送时的说明文字，比如「8月补传」" rows="3"></textarea>
-            <div class="batch-actions">
-                <button class="btn-plain" onclick="cancelBatch()">取消</button>
-                <button id="batchZipBtn" class="btn-primary" onclick="finalizeBatch()">完成·打包发到Kuro</button>
-            </div>
-        </div>
     </div>
 
     <!-- 底部导航 -->
@@ -82,7 +65,6 @@
     </div>
 
 <script src="db.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="home.js"></script>
 </body>
 </html>
