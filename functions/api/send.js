@@ -1,5 +1,5 @@
-// Pages Functions: POST /api/send  前端发消息 -> Telegram 群组
-// body: {text}
+// Pages Functions: POST /api/send  发送文字消息到 Telegram（批量补传 zip 下载链接通知用）
+// body 支持两种：application/json {text} 或 multipart/form-data 字段 text
 
 function corsJson(data, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -10,28 +10,25 @@ function corsJson(data, init = {}) {
   return new Response(JSON.stringify(data), { ...init, headers });
 }
 
-const KV_KEY_MSGS = "messages";
-const MAX_MSGS = 200;
-
-async function pushMessage(KV, msg) {
-  const raw = await KV.get(KV_KEY_MSGS, "text");
-  const list = raw ? JSON.parse(raw) : [];
-  list.push(msg);
-  if (list.length > MAX_MSGS) list.splice(0, list.length - MAX_MSGS);
-  await KV.put(KV_KEY_MSGS, JSON.stringify(list));
-}
-
 export async function onRequest(context) {
   const { request, env } = context;
   if (request.method === "OPTIONS") return corsJson("ok", { status: 204 });
   if (request.method !== "POST") return corsJson({ ok: false, err: "method" }, { status: 405 });
 
-  const KV = env.PUPPY_CHAT;
-  if (!KV) return corsJson({ ok: false, err: "KV not bound. 在 Pages 设置里绑定 KV 命名空间，binding 名 PUPPY_CHAT" }, { status: 500 });
+  // 兼容 JSON 和 FormData 两种请求体
+  let text = "";
+  const ct = request.headers.get("Content-Type") || "";
+  try {
+    if (ct.includes("application/json")) {
+      const body = await request.json();
+      text = body.text || "";
+    } else if (ct.includes("multipart/form-data") || ct.includes("application/x-www-form-urlencoded")) {
+      const fd = await request.formData();
+      text = (fd.get("text") || "").toString();
+    }
+  } catch { return corsJson({ ok: false, err: "bad body" }, { status: 400 }); }
 
-  let body;
-  try { body = await request.json(); } catch { return corsJson({ ok: false, err: "bad json" }, { status: 400 }); }
-  const text = (body.text || "").trim().slice(0, 4000);
+  text = text.trim().slice(0, 4000);
   if (!text) return corsJson({ ok: false, err: "empty" }, { status: 400 });
 
   const tg = await fetch(`https://api.telegram.org/bot${env.TG_Bot_Token}/sendMessage`, {
@@ -40,20 +37,11 @@ export async function onRequest(context) {
     body: JSON.stringify({
       chat_id: env.TG_Chat_ID,
       text,
-      parse_mode: "HTML",
-      disable_web_page_preview: true,
+      disable_web_page_preview: false,
     }),
   });
   const data = await tg.json();
   if (!data.ok) return corsJson({ ok: false, err: data.description, tg: data }, { status: 502 });
 
-  const msg = {
-    id: data.result.message_id,
-    from: "puppy",
-    who: "APP",
-    text,
-    ts: Math.floor(Date.now() / 1000),
-  };
-  await pushMessage(KV, msg);
-  return corsJson({ ok: true, msg });
+  return corsJson({ ok: true, msg_id: data.result.message_id });
 }
